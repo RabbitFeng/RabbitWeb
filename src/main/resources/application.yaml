@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: RabbitHome
+
+# 磁盘目录
+user:
+  path:
+    file: /Users/dongzf/projects/JavaProjects/SpringBoot/RabbitHome/RabbitHome/disk/file/
+    img: /Users/dongzf/projects/JavaProjects/SpringBoot/RabbitHome/RabbitHome/disk/img/
