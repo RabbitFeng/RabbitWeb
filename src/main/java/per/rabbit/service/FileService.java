@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import per.rabbit.common.utils.FileUtil;
+import per.rabbit.common.utils.PathUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,8 +35,8 @@ public class FileService {
 
     private String getTargetPath(String filename) {
         if (FileUtil.isImg(filename)) {
-            return imgPath;
+            return PathUtil.getRootPath(imgPath).normalize().toString();
         }
-        return filePath;
+        return PathUtil.getRootPath(filePath).normalize().toString();
     }
 }

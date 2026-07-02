@@ -1,9 +1,24 @@
 spring:
   application:
     name: RabbitHome
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+server:
+  port: ${PORT:8082}
 
 # 磁盘目录
 user:
   path:
-    file: /Users/dongzf/projects/JavaProjects/SpringBoot/RabbitHome/RabbitHome/disk/file/
-    img: /Users/dongzf/projects/JavaProjects/SpringBoot/RabbitHome/RabbitHome/disk/img/
+    file: disk/file
+    img: disk/img
+
+
+# logging配置
+logging:
+  file:
+    name: ./logs/springboot-app.log
+  level:
+    root: INFO
