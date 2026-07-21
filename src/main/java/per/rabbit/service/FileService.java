@@ -1,15 +1,24 @@
 package per.rabbit.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import per.rabbit.common.utils.FileUtil;
 import per.rabbit.common.utils.PathUtil;
+import per.rabbit.component.FileCache;
+import per.rabbit.dao.FileDao;
+
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
@@ -20,23 +29,73 @@ public class FileService {
     @Value("${user.path.img}")
     private String imgPath;
 
+    @Value("${user.path.disk}")
+    private String diskPath;
+
     @Value("${user.path.file}")
     private String filePath;
 
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private FileCache fileCache;
+
+    /**
+     * 存储文件
+     *
+     * @param multipartFile
+     * @return
+     * @throws IOException
+     */
     public String storeFile(MultipartFile multipartFile) throws IOException {
-        String originalFilename = multipartFile.getOriginalFilename();
-        String targetPath = getTargetPath(originalFilename);
-        String extension = FileUtil.getExtension(originalFilename, true);
-        String newFileName = UUID.randomUUID() +  extension;
-        File file = Paths.get(targetPath, newFileName).toFile();
+        String originalFileName = multipartFile.getOriginalFilename();
+        String extension = FileUtil.getExtension(originalFileName, true);
+
+        String pathDir = getPathDir(originalFileName);
+
+        // 转储时更换为uuid+后缀
+        String mappedName = UUID.randomUUID().toString().replace("-", "") + extension;
+        File file = Paths.get(PathUtil.getRootPath().toString(), pathDir, mappedName).toFile();
         multipartFile.transferTo(file);
-        return newFileName;
+
+        logger.info("store file: {} to {}", originalFileName, pathDir + File.separator + file.getName());
+        fileCache.put(mappedName, new FileDao(mappedName, originalFileName, pathDir));
+        return mappedName;
     }
 
-    private String getTargetPath(String filename) {
-        if (FileUtil.isImg(filename)) {
-            return PathUtil.getRootPath(imgPath).normalize().toString();
+    /**
+     * 提取文件
+     */
+    public Resource takeFile(String filename) throws IOException {
+        FileDao fileDao = fileCache.getOrLoad(filename);
+        if (fileDao == null) {
+            throw new IOException("文件不存在: " + filename);
         }
-        return PathUtil.getRootPath(filePath).normalize().toString();
+
+        try {
+            Path path = Paths.get(PathUtil.getRootPath().toString(), fileDao.getPath());
+            logger.info("take file: {} from {}", filename, path);
+            Resource resource = new UrlResource(path.resolve(filename).normalize().toUri());
+
+            if (!resource.exists()) {
+                throw new RuntimeException("文件不存在: " + filename);
+            }
+            if (!resource.isReadable()) {
+                throw new RuntimeException("文件不可读: " + filename);
+            }
+            return resource;
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 获取文件分区路径
+     */
+    private String getPathDir(String filename) {
+        if (FileUtil.isImg(filename)) {
+            return imgPath;
+        }
+        return filePath;
     }
 }

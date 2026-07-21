@@ -6,12 +6,29 @@ spring:
       enabled: true
       max-file-size: 50MB
       max-request-size: 50MB
+  datasource:
+    # 数据库连接配置
+    url: jdbc:mysql://localhost:3306/demo?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: dzf01025817
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis-plus:
+  configuration:
+    # 在控制台打印生成的真实 SQL 语句，方便调试
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 配置主键自增策略
+      id-type: auto
+
 server:
   port: ${PORT:8082}
 
 # 磁盘目录
 user:
   path:
+    disk: disk
     file: disk/file
     img: disk/img
 
