@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import per.rabbit.common.utils.FileUtil;
 import per.rabbit.common.utils.PathUtil;
 import per.rabbit.component.FileCache;
-import per.rabbit.dao.FileDao;
+import per.rabbit.dao.FileBean;
 
 
 import java.io.File;
@@ -22,8 +21,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+/**
+ * 文件存取服务
+ */
 @Service
-public class FileService {
+public class FileStorageService {
 
     // 注入配置中的路径
     @Value("${user.path.img}")
@@ -59,7 +61,7 @@ public class FileService {
         multipartFile.transferTo(file);
 
         logger.info("store file: {} to {}", originalFileName, pathDir + File.separator + file.getName());
-        fileCache.put(mappedName, new FileDao(mappedName, originalFileName, pathDir));
+        fileCache.put(mappedName, new FileBean(mappedName, originalFileName, pathDir));
         return mappedName;
     }
 
@@ -67,13 +69,13 @@ public class FileService {
      * 提取文件
      */
     public Resource takeFile(String filename) throws IOException {
-        FileDao fileDao = fileCache.getOrLoad(filename);
-        if (fileDao == null) {
+        FileBean fileBean = fileCache.getOrLoad(filename);
+        if (fileBean == null) {
             throw new IOException("文件不存在: " + filename);
         }
 
         try {
-            Path path = Paths.get(PathUtil.getRootPath().toString(), fileDao.getPath());
+            Path path = Paths.get(PathUtil.getRootPath().toString(), fileBean.getPath());
             logger.info("take file: {} from {}", filename, path);
             Resource resource = new UrlResource(path.resolve(filename).normalize().toUri());
 

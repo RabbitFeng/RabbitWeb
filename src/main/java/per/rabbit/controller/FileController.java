@@ -4,7 +4,6 @@ import com.alibaba.fastjson2.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -13,15 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import per.rabbit.common.Result;
-import per.rabbit.common.utils.PathUtil;
-import per.rabbit.dao.FileDao;
-import per.rabbit.service.FileService;
+import per.rabbit.service.FileStorageService;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * 文件接口
@@ -34,9 +29,9 @@ public class FileController {
     private static final Logger log = LoggerFactory.getLogger(FileController.class);
 
     @Autowired
-    public FileService fileService;
+    public FileStorageService fileStorageService;
 
-    @RequestMapping("/file/list")
+    @GetMapping("/file/list")
     public ResponseEntity<JSONObject> getFileList() {
         log.info("getFileList");
         return ResponseEntity.ok().body(new JSONObject());
@@ -45,7 +40,7 @@ public class FileController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST, consumes = "multipart/form-data")
     public Result<String> upload(@RequestPart("file") MultipartFile multipartFile) {
         try {
-            String filename = fileService.storeFile(multipartFile);
+            String filename = fileStorageService.storeFile(multipartFile);
             return Result.success(filename);
         } catch (IOException e) {
             e.printStackTrace();
@@ -57,7 +52,7 @@ public class FileController {
     public ResponseEntity<Resource> download(@PathVariable String filename) {
         log.info("download {}", filename);
         try {
-            Resource resource = fileService.takeFile(filename);
+            Resource resource = fileStorageService.takeFile(filename);
 
             String contentType = MediaType.APPLICATION_OCTET_STREAM.toString();
             try {

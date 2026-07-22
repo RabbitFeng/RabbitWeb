@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName("file_info")
-public class FileDao {
+public class FileBean {
     /**
      * 标记自增主键
      */
@@ -22,10 +22,10 @@ public class FileDao {
     @TableField("path")
     private String path;
 
-    public FileDao() {
+    public FileBean() {
     }
 
-    public FileDao(String mappedName, String originalName, String path) {
+    public FileBean(String mappedName, String originalName, String path) {
         this.mappedName = mappedName;
         this.originalName = originalName;
         this.path = path;

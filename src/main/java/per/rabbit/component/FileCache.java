@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import per.rabbit.common.AbsLruCache;
-import per.rabbit.dao.FileDao;
+import per.rabbit.dao.FileBean;
 import per.rabbit.dao.FileMapper;
 
 import java.util.HashMap;
 import java.util.List;
 
 @Component
-public class FileCache extends AbsLruCache<FileDao> {
+public class FileCache extends AbsLruCache<FileBean> {
     private static final Logger log = LoggerFactory.getLogger(FileCache.class);
 
     @Autowired
@@ -21,7 +21,7 @@ public class FileCache extends AbsLruCache<FileDao> {
 
     @Transactional(rollbackFor = Exception.class, timeout = 5)
     @Override
-    public void put(String key, FileDao value) {
+    public void put(String key, FileBean value) {
         log.info("put: {} {}", key, value);
         super.put(key, value);
 
@@ -31,9 +31,9 @@ public class FileCache extends AbsLruCache<FileDao> {
 
     @Transactional(rollbackFor = Exception.class, timeout = 5)
     @Override
-    protected FileDao loadData(String key) {
+    protected FileBean loadData(String key) {
         log.info("loadData: {}", key);
-        List<FileDao> uuidList = fileMapper.selectByMap(new HashMap<>() {{
+        List<FileBean> uuidList = fileMapper.selectByMap(new HashMap<>() {{
             put("mapped_name", key);
         }});
         if (uuidList.isEmpty()) {
