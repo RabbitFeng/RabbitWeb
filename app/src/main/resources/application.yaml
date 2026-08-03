@@ -1,6 +1,10 @@
 spring:
   application:
     name: RabbitHome
+  # 导入各业务模块的独立配置(不依赖 profile 激活)
+  config:
+    import:
+      - classpath:application-user.yaml
   servlet:
     multipart:
       enabled: true

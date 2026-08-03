@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
+import javax.security.auth.login.AccountException;
 import java.util.HashMap;
 
 @RestControllerAdvice
@@ -47,5 +48,11 @@ public class GlobalExceptionHandler {
         return Result.failed(errs.toString());
     }
 
+    @ExceptionHandler(AccountException.class)
+    @ResponseBody
+    public Result<String> handleAccountException(AccountException exc) {
+        log.error("Account : {}", exc.getMessage());
+        return Result.failed(exc.getMessage());
+    }
 
 }

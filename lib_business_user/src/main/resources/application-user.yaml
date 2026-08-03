@@ -1,0 +1,5 @@
+# 登陆鉴权
+auth:
+  expire:
+    access: 20 # 接口过期
+    refresh: 60 # 登陆过期
