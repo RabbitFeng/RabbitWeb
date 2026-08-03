@@ -10,20 +10,13 @@ import per.rabbit.valid.LoginValid;
 public class LoginValidator implements ConstraintValidator<LoginValid, LoginDTO> {
     @Override
     public boolean isValid(LoginDTO loginDTO, ConstraintValidatorContext constraintValidatorContext) {
-        // 写校验逻辑
-        if(loginDTO.getEmail() == null || loginDTO.getEmail().equals("")){
+        // 跨字段校验：email 和 phone 至少填写一个（单字段的非空/格式校验交给字段注解）
+        boolean hasEmail = loginDTO.getEmail() != null && !loginDTO.getEmail().isBlank();
+        boolean hasPhone = loginDTO.getPhone() != null && !loginDTO.getPhone().isBlank();
+        if (!hasEmail && !hasPhone) {
             log.debug("loginDTO: {}", loginDTO);
             constraintValidatorContext.disableDefaultConstraintViolation();
-            constraintValidatorContext.buildConstraintViolationWithTemplate("邮箱不能为空")
-                    .addPropertyNode("email")
-                    .addConstraintViolation();
-            return false;
-        }
-        if(loginDTO.getPassword() == null || loginDTO.getPassword().equals("")){
-            log.debug("loginDTO: {}", loginDTO);
-            constraintValidatorContext.disableDefaultConstraintViolation();
-            constraintValidatorContext.buildConstraintViolationWithTemplate("密码不能为空")
-                    .addPropertyNode("password")
+            constraintValidatorContext.buildConstraintViolationWithTemplate("邮箱和手机号至少填写一个")
                     .addConstraintViolation();
             return false;
         }

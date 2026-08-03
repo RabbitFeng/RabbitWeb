@@ -11,7 +11,6 @@ import per.rabbit.dto.UserRegisterDTO;
 import per.rabbit.dto.LoginDTO;
 import per.rabbit.dto.LoginVO;
 import per.rabbit.service.AccountService;
-import per.rabbit.valid.LoginValid;
 
 import javax.security.auth.login.AccountException;
 
@@ -24,7 +23,8 @@ public class AccountController {
     public AccountService accountService;
 
     @PostMapping(path = "/login", produces = "application/json")
-    public Result<LoginVO> login(@LoginValid @RequestBody LoginDTO loginDTO) {
+    public Result<LoginVO> login(@Valid @RequestBody LoginDTO loginDTO) {
+        logger.info("login: {}", loginDTO);
         LoginVO login = accountService.login(loginDTO);
         return Result.success(login);
     }

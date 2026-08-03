@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @TableName("user_info")
@@ -22,7 +24,7 @@ public class UserInfoDao {
     @TableField("phone")
     private String phone;
     @TableField("created_time")
-    private long createdTime;
+    private LocalDateTime createdTime;
     @TableField("updated_time")
-    private long updateTime;
+    private LocalDateTime updateTime;
 }

@@ -2,6 +2,8 @@ package per.rabbit.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,7 +11,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-import javax.security.auth.login.AccountException;
 import java.util.HashMap;
 
 @RestControllerAdvice
@@ -20,7 +21,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Result<String> handleException(Exception exc) {
         log.error("Exception : {}", exc.getMessage(), exc);
-        return Result.failed("Internal error!");
+        return Result.failed("Internal error! ");
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
@@ -47,12 +48,4 @@ public class GlobalExceptionHandler {
         log.error("Invalid Param: {}", exc.getMessage());
         return Result.failed(errs.toString());
     }
-
-    @ExceptionHandler(AccountException.class)
-    @ResponseBody
-    public Result<String> handleAccountException(AccountException exc) {
-        log.error("Account : {}", exc.getMessage());
-        return Result.failed(exc.getMessage());
-    }
-
 }

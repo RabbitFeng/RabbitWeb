@@ -5,9 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import per.rabbit.valid.LoginValid;
 
 @Data
 @NoArgsConstructor
+@LoginValid
 public class LoginDTO {
     @Email(message = "email format is incorrect")
     private String email;
