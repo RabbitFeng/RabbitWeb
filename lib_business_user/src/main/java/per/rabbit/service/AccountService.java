@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import per.rabbit.dao.UserInfoDao;
 import per.rabbit.dao.UserInfoMapper;
 import per.rabbit.dto.LoginDTO;
@@ -65,6 +66,7 @@ public class AccountService {
      * @param loginDTO
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public LoginVO login(LoginDTO loginDTO) {
         String email = loginDTO.getEmail();
         String phone = loginDTO.getPhone();
@@ -93,20 +95,5 @@ public class AccountService {
             setAccessToken(accessToken);
             setRefreshToken(refreshToken);
         }};
-    }
-
-    /**
-     * 获取用户ID
-     *
-     * @param token
-     * @return
-     */
-    public String getUserId(String token) {
-        return authUtil.getUserId(token);
-    }
-
-    public boolean logout(String token) {
-        loginUserMap.remove(authUtil.getUserId(token));
-        return true;
     }
 }

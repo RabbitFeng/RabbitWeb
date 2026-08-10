@@ -41,6 +41,13 @@ public class AccountController {
         return Result.success("注册成功");
     }
 
+    /**
+     * 更新用户信息
+     */
+    public Result<String> updateProfile(){
+        return null;
+    }
+
 //    @RequestMapping(path = "/testauth", method = RequestMethod.POST, produces = "application/json")
 //    public Result<String> testauth(@RequestHeader(name = "TOKEN") String token) {
 //        Utils.log("LoginController", "testauth: " + token);
