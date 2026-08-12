@@ -29,10 +29,10 @@ public class SecurityConfig {
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(ahr ->
-//                        ahr.anyRequest().permitAll()) // TODO: 测试用，全部不加登录鉴权
-                        ahr.requestMatchers("api/account/login").permitAll()
-                                .requestMatchers("api/account/register").permitAll()
-                                .anyRequest().authenticated())
+                        ahr.anyRequest().permitAll()) // TODO: 测试用，全部不加登录鉴权
+//                        ahr.requestMatchers("api/account/login").permitAll()
+//                                .requestMatchers("api/account/register").permitAll()
+//                                .anyRequest().authenticated())
                 .exceptionHandling(httpRequest ->
                         httpRequest.authenticationEntryPoint(restAuthEntryPoint))
                 // JWT过滤器插到用户名密码过滤器前

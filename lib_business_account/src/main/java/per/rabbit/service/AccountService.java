@@ -38,20 +38,23 @@ public class AccountService {
     private PasswordEncoder passwordEncoder;
 
     public UserRegisterVO register(UserRegisterDTO userRegisterDTO) throws AccountException {
+        String email = userRegisterDTO.getEmail();
+        String phone = userRegisterDTO.getPhone();
+        boolean hasEmail = email != null && !email.isEmpty();
+        boolean hasPhone = phone != null && !phone.isEmpty();
         // 2. 检查用户是否存在
-        UserInfoDao userInfoDao = userInfoMapper.selectOne(new QueryWrapper<UserInfoDao>()
-                .select("user_id")
-                .eq("email", userRegisterDTO.getEmail())
-                .or()
-                .eq("phone", userRegisterDTO.getPhone())
+        UserInfoDao userInfoDao = userInfoMapper.selectOne(new LambdaQueryWrapper<UserInfoDao>()
+                .select(UserInfoDao::getAccountId)
+                .eq(hasEmail, UserInfoDao::getEmail, userRegisterDTO.getEmail())
+                .or(hasEmail && hasPhone)
+                .eq(hasPhone, UserInfoDao::getPhone, userRegisterDTO.getPhone())
         );
         if (userInfoDao != null) {
             throw new AccountException("用户已存在!");
         }
 
         userInfoMapper.insert(new UserInfoDao() {{
-            setUserId(UUID.randomUUID().toString().replace("-", ""));
-            setUserName(userRegisterDTO.getUsername());
+            setAccountId(UUID.randomUUID().toString().replace("-", ""));
             setPwd(passwordEncoder.encode(userRegisterDTO.getPassword()));
             setEmail(userRegisterDTO.getEmail());
             setPhone(userRegisterDTO.getPhone());
@@ -76,7 +79,7 @@ public class AccountService {
         boolean hasEmail = email != null && !email.isBlank();
         boolean hasPhone = phone != null && !phone.isBlank();
         UserInfoDao userInfoDao = userInfoMapper.selectOne(new LambdaQueryWrapper<UserInfoDao>()
-                .select(UserInfoDao::getUserId, UserInfoDao::getPwd)
+                .select(UserInfoDao::getAccountId, UserInfoDao::getPwd)
                 .eq(hasEmail, UserInfoDao::getEmail, email)
                 .or(hasEmail && hasPhone)
                 .eq(hasPhone, UserInfoDao::getPhone, phone));
@@ -85,7 +88,7 @@ public class AccountService {
             throw new LoginException("用户名或密码错误!");
         }
 
-        String userId = userInfoDao.getUserId();
+        String userId = userInfoDao.getAccountId();
 
         // 默认成功
         // 2. 下发Token, 下发两个Token，AccessToken用于接口鉴权，时间较短；loginToken用于刷新AccessToken，也可以作为登陆用户

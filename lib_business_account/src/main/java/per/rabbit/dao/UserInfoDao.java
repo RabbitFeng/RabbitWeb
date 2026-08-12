@@ -9,14 +9,12 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-@TableName("user_info")
+@TableName("account_info")
 public class UserInfoDao {
     @TableField("id")
     private Long id;
-    @TableField("user_id")
-    private String userId;
-    @TableField("user_name")
-    private String userName;
+    @TableField("account_id")
+    private String accountId;
     @TableField("pwd")
     private String pwd;
     @TableField("email")

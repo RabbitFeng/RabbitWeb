@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>per.rabbit</groupId>
-            <artifactId>lib_business_user</artifactId>
+            <artifactId>lib_business_account</artifactId>
         </dependency>
         <dependency>
             <groupId>per.rabbit</groupId>
@@ -30,7 +30,10 @@
             <groupId>per.rabbit</groupId>
             <artifactId>lib_common</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>per.rabbit</groupId>
+            <artifactId>lib_business_main</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

@@ -47,7 +47,7 @@ CREATE TABLE `user_info`
 `id`           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
 `user_id`      VARCHAR(32)     NOT NULL DEFAULT '' COMMENT 'user_id',
 `user_name`    VARCHAR(32)     NOT NULL DEFAULT '' COMMENT '用户名称',
-`pwd`          VARCHAR(32)     NOT NULL DEFAULT '' COMMENT '密码',
+`pwd`          VARCHAR(100)    NOT NULL DEFAULT '' COMMENT '密码（BCrypt 哈希，固定 60 字符，留余量）',
 `email`        VARCHAR(64)     NOT NULL DEFAULT '' COMMENT '邮箱',
 `phone`        VARCHAR(16) COMMENT '电话号码',
 `created_time` DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -58,3 +58,10 @@ DEFAULT CHARSET = utf8mb4
 DEFAULT COLLATE = utf8mb4_unicode_ci COMMENT = '用户信息表';
 ```
 
+食品详情表
+```sql
+CREATE TABLE `food_`
+(
+    `id`
+)
+```

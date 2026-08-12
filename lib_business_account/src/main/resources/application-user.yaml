@@ -1,0 +1,6 @@
+# 登陆鉴权
+auth:
+  secret: "rabbit_web_login_aaaaaaaaaaaaaaa"
+  expire:
+    access: 600 # 接口过期 - 配置为10分钟过期
+    refresh: 864000 # 登陆过期
