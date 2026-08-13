@@ -22,8 +22,12 @@ public class Result<T> {
     }
 
     public static <T> Result<T> failed(T data) {
+        return failed(-1, data);
+    }
+
+    public static <T> Result<T> failed(int code, T data) {
         return new Result<>() {{
-            setCode(-1);
+            setCode(code);
             setMsg("请求失败");
             setData(data);
             setLogId(String.valueOf(System.currentTimeMillis()));

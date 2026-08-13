@@ -1,5 +1,7 @@
-package per.rabbit.filter;
+package per.rabbit.config;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,23 +28,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        log.info("JwtAuthFilter doFilterInternal " + request.getRequestURL().toString());
+        log.info("JwtAuthFilter doFilterInternal {}", request.getRequestURL().toString());
         String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
             try {
-                io.jsonwebtoken.Claims claims = authUtil.parseToken(token);
+                Claims claims = authUtil.parseToken(token);
+                // 业务接口只接受 accessToken，refreshToken 仅用于 /refresh 换发
+                if (!AuthUtil.TYPE_ACCESS.equals(claims.get(AuthUtil.CLAIM_TYPE, String.class))) {
+                    throw new io.jsonwebtoken.JwtException("非法的Token类型");
+                }
                 String userId = claims.getSubject();
-                log.info("JwtAuthFilter doFilterInternal userId = " + userId);
+                log.info("JwtAuthFilter doFilterInternal userId = {}", userId);
                 // 无权限体系，权限列表给空
                 var authToken = new UsernamePasswordAuthenticationToken(userId, null, AuthorityUtils.NO_AUTHORITIES);
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-            } catch (Exception e) {
-                log.info("JwtAuthFilter doFilterInternal error " + e.getMessage());
+            } catch (JwtException e) {
+                log.info("JwtAuthFilter doFilterInternal error {}", e.getMessage());
                 // 这里不返回401，交给AuthenticationEntryPoint统一处理
                 SecurityContextHolder.clearContext();
             }
         }
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 }

@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import per.rabbit.common.Result;
+import per.rabbit.dto.UserRefreshDTO;
+import per.rabbit.dto.UserRefreshVO;
 import per.rabbit.dto.UserRegisterDTO;
 import per.rabbit.dto.LoginDTO;
 import per.rabbit.dto.LoginVO;
@@ -31,6 +33,7 @@ public class AccountController {
 
     /**
      * 注册接口
+     *
      * @param userRegisterDTO
      * @return
      * @throws AccountException
@@ -42,9 +45,21 @@ public class AccountController {
     }
 
     /**
+     * 刷新Token：使用 refreshToken 换发新的 accessToken
+     *
+     * @return 新的 accessToken
+     */
+    @PostMapping(path = "/refresh", produces = "application/json")
+    public Result<UserRefreshVO> refresh(@Valid @RequestBody UserRefreshDTO userRefreshDTO) {
+        logger.info("refresh: {}", userRefreshDTO);
+        UserRefreshVO refreshVO = accountService.refreshToken(userRefreshDTO.getToken());
+        return Result.success(refreshVO);
+    }
+
+    /**
      * 更新用户信息
      */
-    public Result<String> updateProfile(){
+    public Result<String> updateProfile() {
         return null;
     }
 

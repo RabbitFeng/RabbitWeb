@@ -24,6 +24,19 @@ public class AuthUtil {
 
     private Key cachedKey = null;
 
+    /**
+     * token 类型 claim 的 key
+     */
+    public static final String CLAIM_TYPE = "type";
+    /**
+     * accessToken 类型标识
+     */
+    public static final String TYPE_ACCESS = "access";
+    /**
+     * refreshToken 类型标识
+     */
+    public static final String TYPE_REFRESH = "refresh";
+
     private Key getKey(){
         if(cachedKey == null){
             cachedKey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
@@ -33,16 +46,17 @@ public class AuthUtil {
 
 
     public final String generateAccessToken(String userId) {
-        return generateToken(userId, ACCESS_TOKEN_EXP);
+        return generateToken(userId, TYPE_ACCESS, ACCESS_TOKEN_EXP);
     }
 
     public final String generateRefreshToken(String userId) {
-        return generateToken(userId, REFRESH_TOKEN_EXP);
+        return generateToken(userId, TYPE_REFRESH, REFRESH_TOKEN_EXP);
     }
 
-    public final String generateToken(String userId, long expire) {
+    public final String generateToken(String userId, String type, long expire) {
         return Jwts.builder()
                 .setSubject(userId)
+                .claim(CLAIM_TYPE, type)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expire))
                 .signWith(getKey())

@@ -2,6 +2,8 @@ package per.rabbit.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -9,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import per.rabbit.dao.UserInfoDao;
 import per.rabbit.dao.UserInfoMapper;
-import per.rabbit.dto.LoginDTO;
-import per.rabbit.dto.LoginVO;
-import per.rabbit.dto.UserRegisterDTO;
-import per.rabbit.dto.UserRegisterVO;
+import per.rabbit.dto.*;
 import per.rabbit.exc.LoginException;
 import per.rabbit.util.AuthUtil;
 
@@ -97,6 +96,36 @@ public class AccountService {
         return new LoginVO() {{
             setAccessToken(accessToken);
             setRefreshToken(refreshToken);
+        }};
+    }
+
+    /**
+     * 使用 refreshToken 换发新的 accessToken
+     *
+     * @param refreshToken 登陆时下发的 refreshToken
+     * @return 包含新 accessToken 的 UserRefreshVO
+     */
+    public UserRefreshVO refreshToken(String refreshToken) {
+        String userId;
+        try {
+            Claims claims = authUtil.parseToken(refreshToken);
+            // 只允许 refreshToken 换发，防止 accessToken 被当作 refreshToken 使用
+            if (!AuthUtil.TYPE_REFRESH.equals(claims.get(AuthUtil.CLAIM_TYPE, String.class))) {
+                throw new LoginException("无效的Token!");
+            }
+            userId = claims.getSubject();
+        } catch (ExpiredJwtException e) {
+            throw new LoginException("登陆已过期，请重新登陆!");
+        } catch (LoginException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new LoginException("无效的Token!");
+        }
+
+        // 校验通过，重新签发短效 accessToken
+        String accessToken = authUtil.generateAccessToken(userId);
+        return new UserRefreshVO() {{
+            setToken(accessToken);
         }};
     }
 }

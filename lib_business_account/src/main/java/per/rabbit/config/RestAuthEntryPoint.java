@@ -20,6 +20,8 @@ public class RestAuthEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write(JSON.toJSONString(Result.failed("未登录或登录过期")));
+        Result<String> result = Result.failed("Token过期");
+        result.setCode(-10001);// AccessToken过期
+        response.getWriter().write(JSON.toJSONString(result));
     }
 }
