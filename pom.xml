@@ -28,6 +28,7 @@
         <module>lib_business_storage</module>
         <module>lib_business_info_flow</module>
         <module>lib_business_main</module>
+        <module>lib_business_21_point</module>
     </modules>
     <scm>
         <connection/>
@@ -73,6 +74,11 @@
             <dependency>
                 <groupId>per.rabbit</groupId>
                 <artifactId>lib_business_main</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>per.rabbit</groupId>
+                <artifactId>lib_business_21_point</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

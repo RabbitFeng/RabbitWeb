@@ -5,6 +5,7 @@ spring:
   config:
     import:
       - classpath:application-user.yaml
+      - classpath:application-21-point.yaml
   servlet:
     multipart:
       enabled: true

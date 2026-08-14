@@ -1,0 +1,7 @@
+netty:
+  port: 9090
+  path: /ws
+  boss-thread-count: 1
+  worker-thread-count: 0 # 0默认cpu*2
+  reader-idle-time: 30 # 心跳检测超时秒数
+  writer-idle-time: 60 # 写操作空闲超时秒数
