@@ -62,13 +62,16 @@ public class GameServerHandler extends SimpleChannelInboundHandler<TextWebSocket
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.info("新链接建立! {}", ctx.channel().id());
+        if (log.isInfoEnabled()) {
+            log.info("新链接建立! {}, {}", ctx.channel().id() , ctx.channel().remoteAddress());
+        }
         super.channelActive(ctx);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        log.info("链接 inactive! {}", ctx.channel().id());
+        log.info("链接 inactive! {}, {}", ctx.channel().id(), ctx.channel().remoteAddress());
+        channelRepository.removeChannel(ctx.channel());
         super.channelInactive(ctx);
     }
 
@@ -84,7 +87,7 @@ public class GameServerHandler extends SimpleChannelInboundHandler<TextWebSocket
         if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) evt;
             if (event.state() == IdleState.READER_IDLE) {
-                log.warn("心跳超时，强制关闭连接:{}", ctx.channel().id());
+                log.warn("心跳超时，强制关闭连接:{}, {}", ctx.channel().id(), ctx.channel().remoteAddress());
                 ctx.close();
             }
         } else {
@@ -95,8 +98,14 @@ public class GameServerHandler extends SimpleChannelInboundHandler<TextWebSocket
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         String payload = msg.text();
-        RequestPacket requestPacket = JSON.parseObject(payload, RequestPacket.class);
+        // 1. 心跳包
+        if ("ping".equalsIgnoreCase(payload)) {
+            log.debug("heartbeat from " + ctx.channel().id() + " " + ctx.channel().remoteAddress());
+            ctx.writeAndFlush(new TextWebSocketFrame("pong"));
+            return;
+        }
 
+        RequestPacket requestPacket = JSON.parseObject(payload, RequestPacket.class);
         // 2. 寻找匹配的cmd业务处理方法
         MethodWrapper methodWrapper = handlerMap.get(requestPacket.getCmd());
         if (methodWrapper != null) {

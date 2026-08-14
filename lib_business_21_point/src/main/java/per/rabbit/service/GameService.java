@@ -1,5 +1,6 @@
 package per.rabbit.service;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,26 @@ public class GameService {
     private ChannelRepository channelRepository;
 
     /**
-     * 处理1001的封装接口
-     * @return
+     * 登录接口 10001
+     * data:
+     * {
+     * "user_id": "xxx"
+     * }
+     *
      */
     @CmdHandler(10001)
-    public long handleMsg(CmdData cmdData) {
-        log.info("handleMsg, channel: {}, msg: {}", cmdData.getChannel(), cmdData.getMsg());
+    public long login(CmdData cmdData) {
+        log.info("handleMsg, channel: {}, msg: {} {}", cmdData.getChannel(), cmdData.getMsg().getClass().getSimpleName(), cmdData.getMsg());
+        if (cmdData.isJson()) {
+            JSONObject json = cmdData.json();
+            if (json != null) {
+                String userId = json.getString("user_id");
+                log.info("login, userId: {}, channel: {}", userId, cmdData.getChannel());
+                if (userId != null) {
+                    channelRepository.add(userId, cmdData.getChannel());
+                }
+            }
+        }
         return 10001;
     }
 }

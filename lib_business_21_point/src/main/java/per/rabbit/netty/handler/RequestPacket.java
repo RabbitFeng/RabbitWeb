@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class RequestPacket {
     private int cmd;
-    private String data; // 或者byte[] data 用于protobuf
+    private Object data;
 }
 

@@ -25,22 +25,33 @@ public class ChannelRepository {
      */
     private final Map<String, Channel> userIdChannelMap = new ConcurrentHashMap<>();
 
+    /**
+     * Channel ID -> userId反向映射
+     */
+    private final Map<Channel, String> channelUserMap = new ConcurrentHashMap<>();
+
     public void add(String userId, Channel channel) {
         globalGroup.add(channel);
         userIdChannelMap.put(userId, channel);
+        channelUserMap.put(channel, userId);
     }
 
     public void removeChannel(Channel channel) {
         globalGroup.remove(channel);
-        for (String s : userIdChannelMap.keySet()) {
-            if (userIdChannelMap.get(s) == channel) {
-                userIdChannelMap.remove(s);
-            }
-        }
+        userIdChannelMap.remove(getUserID(channel));
+        channelUserMap.remove(channel);
     }
 
-    public Channel get(String userId) {
-        return userIdChannelMap.get(userId);
+    public void removeUser(String userId) {
+        removeChannel(userIdChannelMap.get(userId));
+    }
+
+    public Channel get(String userID) {
+        return userIdChannelMap.get(userID);
+    }
+
+    public String getUserID(Channel channel) {
+        return channelUserMap.get(channel);
     }
 
     public ChannelGroup getChannelGroup() {
